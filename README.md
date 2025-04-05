@@ -27,33 +27,52 @@ This analysis was conducted to understand the relationships between gender, play
 ### Loading Data
 The first step in any data analysis is to load the dataset. In this case, we worked with a file named `players.csv`, which contains information on each player's gender, age, and the total number of hours they’ve played. We used the `read_csv()` function from the `readr` package to read the data into R as a data frame. This forms the foundational dataset for our entire analysis.
 
+##Importing the package using library function
+
 library(tidyverse)
-library(repr)
+library(readr)
 library(tidymodels)
 options(repr.matrix.max.rows = 5)
 # source('cleanup.R')
-
-player_url <- "https://raw.githubusercontent.com/minjikoo3/DSCI_100_Project_Planning/refs/heads/main/players.csv"
-players <- read_csv(player_url)
+	
+##Load the data
+players<- read_csv ("data/players (1).csv")
 head(players)
 
 ###  Data Cleaning and Preprocessing
 Raw data often includes unnecessary or inconsistent information, so cleaning is essential. In this step, we:
 
-##### Selected relevant columns
-(`gender`, `played_hours`, `Age`) that are important for our analysis.
+# Tidy and clean the data 
 
-##### Removed missing values 
-By using `drop_na()` to ensure we don’t introduce bias or errors in our models.
+##select the columns that are focused on this analysis. 
 
-##### Converted the gender column into a categorical factor
-Since gender is a non-numeric variable and needs to be treated differently in modeling and plotting.
-This step ensures that the dataset is tidy, consistent, and ready for analysis.
+players_select<-players |>
+    select(gender, Age, played_hours)
 
-players_tidy <- players |>
-select(gender, played_hours, Age) |>
-drop_na() |> 
-mutate(gender = as.factor(gender))
+# Filter the gender column to only rows with "Male" and "Female"
+
+players_filter <- players_select |>
+    filter(gender != "Non-binary",gender != "Two-Spirited", gender !=  "Prefer not to say", gender != "Agender", gender != "Other" )
+players_filter
+
+## The average video game played hours is calculated for each age
+players_summarize <- players_filter |>
+    group_by(Age) |>
+    summarize(average_hr=mean(played_hours), na.rm=TRUE)
+players_summarize
+
+##A visualization (bar plot) that illustrate the the played hours for each age bewteen male and female
+options(repr.plot.width = 15, repr.plot.height = 15)
+
+players_plot <- players_filter |>
+    ggplot(aes(x = Age, y = played_hours, fill = gender)) +
+    geom_col(position = "dodge") +
+    labs(x = "Age of players", y = "Average Played Hours", fill = "Gender (Male or Female)") +
+    theme(text = element_text(size = 18)) +
+    ggtitle("The relationship between age and average played hours for female and male")
+players_plot
+
+
 
 ### Data Standardization
 To make comparisons and model training more effective, we standardized the numerical variables — `played_hours` and `Age`. Standardization involves transforming the data so that it has a mean of 0 and a standard deviation of 1. We do this because variables on different scales (e.g., age in years vs. hours played in hundreds) can disproportionately influence model behavior. Scaling ensures that each variable contributes equally to the analysis.
