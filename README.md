@@ -22,7 +22,7 @@ There are a variety of data types in the dataset:
 While the `players.csv` dataset provides valuable insight into player demographics and engagement, for our analysis, it is important to consider the limitations, particularly in the context of our analysis. The variable `played_hours` does not account for session quality or context—a player may be logged in but not actively engaged, leading to overestimation of true gameplay involvement. This can heavily impact our analysis since our analysis focuses on three variables: `played_hours`, `age`, and `gender`. As a result, interpretations based on `played_hours` must be made with caution, and their limitations must be recognized. 
 
 ### Loading Data
-The analysis begins by loading the dataset containing player information, including gender, played hours, and age. We use the read_csv() function to import the dataset into R.
+The analysis begins by loading the dataset containing player information, including gender, played hours, and age. We use the `read_csv()` function to import the dataset into R.
 
 player_url <- "https://raw.githubusercontent.com/minjikoo3/DSCI_100_Project_Planning/refs/heads/main/players.csv"
 players <- read_csv(player_url)
@@ -43,9 +43,9 @@ drop_na() |>
 mutate(gender = as.factor(gender))
 
 ### Data Standardization
-To ensure that all numerical features have a consistent scale, played_hours and Age are standardized using the scale() function. This ensures that all numerical variables have a mean of 0 and a standard deviation of 1, improving model performance.
+To ensure that all numerical features have a consistent scale, played_hours and Age are standardized using the `scale()` function. This ensures that all numerical variables have a mean of 0 and a standard deviation of 1, improving model performance.
 
-players_scaled <- players_tidy %>%
+players_scaled <- players_tidy |>
 mutate(played_hours = scale(played_hours), Age = scale(Age))
 
 ### Data Splitting (Training & Testing Sets)
@@ -55,7 +55,7 @@ To evaluate model performance, the dataset is split into:
 
 25% testing data for performance assessment
 
-The initial_split() function ensures a stratified split based on gender, so each class is proportionally represented in both training and testing sets.
+The `initial_split()` function ensures a stratified split based on gender, so each class is proportionally represented in both training and testing sets.
 
 set.seed(123)
 players_split <- initial_split(players_scaled, prop = 0.75, strata = gender)
@@ -63,7 +63,7 @@ players_train <- training(players_split)
 players_test <- testing(players_split)
 
 ### Implementing Five-Fold Cross-Validation
-To reduce overfitting and improve model generalization, we use 5-fold cross-validation (vfold_cv()). This technique divides the training data into five subsets (folds), where the model is trained on four folds and tested on the remaining one. This process repeats five times, ensuring robust evaluation.
+To reduce overfitting and improve model generalization, we use 5-fold cross-validation `vfold_cv()`. This technique divides the training data into five subsets (folds), where the model is trained on four folds and tested on the remaining one. This process repeats five times, ensuring robust evaluation.
 
 players_vfold <- vfold_cv(players_train, v = 5, strata = gender)
 players_vfold
@@ -87,7 +87,7 @@ gender_bar
 Figure 2: Gender Distribution by Age
 A stacked bar plot displays gender distribution across age groups, highlighting engagement trends across different age demographics.
 
-players_age_line <- players_tidy %>%
+players_age_line <- players_tidy |>
 ggplot(aes(x = Age, fill = gender)) + 
 geom_bar() + 
 xlab("Age of Players") +
