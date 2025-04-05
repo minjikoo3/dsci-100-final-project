@@ -82,7 +82,7 @@ This process repeats 5 times, each time using a different fold for validation.
 
 This technique helps detect overfitting and provides a better estimate of how the model is expected to perform on new data. Stratification by gender is used again here to ensure balance across folds.
 
-players_vfold <- vfold_cv(players_train, v = 5, strata = gender)
+suppressWarnings(players_vfold <- vfold_cv(players_train, v = 5, strata = gender))
 players_vfold
 
 ### Data Visualization
@@ -105,11 +105,35 @@ Figure 2: Gender Distribution by Age
 This stacked bar chart displays how player age is distributed across different gender categories. It gives us insight into which age groups are dominant within each gender and how engagement may vary by demographic.
 
 players_age_line <- players_tidy |>
-ggplot(aes(x = Age, fill = gender)) + 
-geom_bar() + 
-xlab("Age of Players") +
-ylab("Count of Players") +
-ggtitle("Figure 2: Gender Distribution by Age") +
+ggplot(aes(x = Age, y = gender, fill = gender)) + 
+geom_bar(stat = "identity") + 
+xlab("Age of the Players") +
+ylab("Gender of Players") +
+ggtitle("Gender vs Age of the Players") +
 scale_fill_brewer(palette = "Set2") + 
 theme(text = element_text(size = 20))
 players_age_line
+
+Figure 3 shows how played hours vary across different genders, separately for the training and testing sets. We use boxplots because they effectively highlight the median, spread, and potential outliers in the data.
+By faceting by set (Train vs Test), we check whether the model has a balanced representation of each gender and their play behavior in both splits. This ensures that training and testing sets are comparable and that the model is not learning from a skewed or biased subset. If the distribution looked drastically different between the two, it would raise concerns about the reliability of model performance metrics.
+
+ggplot(players_combined, aes(x = gender, y = played_hours, fill = gender)) +
+geom_boxplot() +
+facet_wrap(~ set) +
+xlab("Gender") +
+ylab("Standardized Played Hours") +
+ggtitle("Figure 3: Played Hours by Gender (Train vs Test)") +
+scale_fill_brewer(palette = "Set2") +
+theme(text = element_text(size = 20))
+
+Figure 4 uses histograms to visualize how age is distributed by gender in the training and testing sets. This helps us confirm whether the age distribution is similar between the two splits and whether gender proportions are maintained across different age ranges.
+We chose a histogram because it’s ideal for seeing the frequency distribution of a continuous variable like age. The alpha blending allows overlapping bars to show where genders co-occur more frequently. Ensuring these distributions align across splits is important for the validity and generalizability of the model, especially since age is a key explanatory variable in our analysis.
+
+ggplot(players_combined, aes(x = Age, fill = gender)) +
+geom_histogram(position = "identity", alpha = 0.6, bins = 20) +
+facet_wrap(~ set) +
+xlab("Standardized Age") +
+ylab("Count") +
+ggtitle("Figure 4: Age Distribution by Gender (Train vs Test)") +
+scale_fill_brewer(palette = "Set2") +
+theme_minimal(base_size = 14)
