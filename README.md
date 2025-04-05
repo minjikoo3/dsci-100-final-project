@@ -21,21 +21,28 @@ There are a variety of data types in the dataset:
 
 While the `players.csv` dataset provides valuable insight into player demographics and engagement, for our analysis, it is important to consider the limitations, particularly in the context of our analysis. The variable `played_hours` does not account for session quality or context—a player may be logged in but not actively engaged, leading to overestimation of true gameplay involvement. This can heavily impact our analysis since our analysis focuses on three variables: `played_hours`, `age`, and `gender`. As a result, interpretations based on `played_hours` must be made with caution, and their limitations must be recognized. 
 
+### Methods
+This analysis was conducted to understand the relationships between gender, played hours, and age among players on a Minecraft server. The goal was to clean and prepare the data for predictive modeling while also exploring patterns in player engagement. Below, each step of the analytical process is described in detail, from data loading to cross-validation setup.
+
 ### Loading Data
-The analysis begins by loading the dataset containing player information, including gender, played hours, and age. We use the `read_csv()` function to import the dataset into R.
+The first step in any data analysis is to load the dataset. In this case, we worked with a file named `players.csv`, which contains information on each player's gender, age, and the total number of hours they’ve played. We used the `read_csv()` function from the `readr` package to read the data into R as a data frame. This forms the foundational dataset for our entire analysis.
 
 player_url <- "https://raw.githubusercontent.com/minjikoo3/DSCI_100_Project_Planning/refs/heads/main/players.csv"
 players <- read_csv(player_url)
 head(players)
 
 ###  Data Cleaning and Preprocessing
-Before conducting the analysis, the dataset is cleaned and preprocessed to ensure consistency and remove irrelevant information.
-Steps:
-Select relevant variables: We only keep gender, played_hours, and Age since they are needed for the analysis.
+Raw data often includes unnecessary or inconsistent information, so cleaning is essential. In this step, we:
 
-Handle missing values: Any NA values are removed to prevent errors in modeling.
+##### Selected relevant columns
+(`gender`, `played_hours`, `Age`) that are important for our analysis.
 
-Convert gender to a factor: Since gender is a categorical variable, it is converted into a factor type for analysis.
+##### Removed missing values 
+By using `drop_na()` to ensure we don’t introduce bias or errors in our models.
+
+##### Converted the gender column into a categorical factor
+Since gender is a non-numeric variable and needs to be treated differently in modeling and plotting.
+This step ensures that the dataset is tidy, consistent, and ready for analysis.
 
 players_tidy <- players |>
 select(gender, played_hours, Age) |>
@@ -43,19 +50,19 @@ drop_na() |>
 mutate(gender = as.factor(gender))
 
 ### Data Standardization
-To ensure that all numerical features have a consistent scale, played_hours and Age are standardized using the `scale()` function. This ensures that all numerical variables have a mean of 0 and a standard deviation of 1, improving model performance.
+To make comparisons and model training more effective, we standardized the numerical variables — `played_hours` and `Age`. Standardization involves transforming the data so that it has a mean of 0 and a standard deviation of 1. We do this because variables on different scales (e.g., age in years vs. hours played in hundreds) can disproportionately influence model behavior. Scaling ensures that each variable contributes equally to the analysis.
 
 players_scaled <- players_tidy |>
 mutate(played_hours = scale(played_hours), Age = scale(Age))
 
 ### Data Splitting (Training & Testing Sets)
-To evaluate model performance, the dataset is split into:
+To evaluate how well our models will perform on new, unseen data, we split our dataset into two parts:
 
-75% training data for model building
+Training set (75%) – used to train and tune models.
 
-25% testing data for performance assessment
+Testing set (25%) – held back for evaluating model performance.
 
-The `initial_split()` function ensures a stratified split based on gender, so each class is proportionally represented in both training and testing sets.
+We used stratified sampling with `gender` as the stratifying variable. This ensures that the gender proportions in both sets are consistent with the overall dataset, which helps preserve class balance during training and testing.
 
 set.seed(123)
 players_split <- initial_split(players_scaled, prop = 0.75, strata = gender)
@@ -63,16 +70,26 @@ players_train <- training(players_split)
 players_test <- testing(players_split)
 
 ### Implementing Five-Fold Cross-Validation
-To reduce overfitting and improve model generalization, we use 5-fold cross-validation `vfold_cv()`. This technique divides the training data into five subsets (folds), where the model is trained on four folds and tested on the remaining one. This process repeats five times, ensuring robust evaluation.
+Instead of relying on just one train-test split, we implemented five-fold cross-validation using `vfold_cv()`.
+
+In five-fold CV:
+
+The training data is split into 5 subsets (or "folds").
+
+The model is trained on 4 folds and validated on the remaining one.
+
+This process repeats 5 times, each time using a different fold for validation.
+
+This technique helps detect overfitting and provides a better estimate of how the model is expected to perform on new data. Stratification by gender is used again here to ensure balance across folds.
 
 players_vfold <- vfold_cv(players_train, v = 5, strata = gender)
 players_vfold
 
 ### Data Visualization
-To gain insights into the dataset, we create visualizations that help in understanding the distribution of gender, played hours, and age.
+To understand the data better, we created two visualizations using `ggplot`. These help explore patterns and potential relationships between gender, age, and played hours.
 
 Figure 1: Total Played Hours by Gender
-A bar plot shows the total hours played per gender, indicating which groups contribute the most data.
+This bar chart shows the total number of hours played by each gender group. It helps identify which gender groups are more active or more represented in the game environment
 
 gender_bar <- players_tidy |>
 ggplot(aes(x = gender, y = played_hours, fill = gender)) +
@@ -85,7 +102,7 @@ theme(text = element_text(size = 20))
 gender_bar
 
 Figure 2: Gender Distribution by Age
-A stacked bar plot displays gender distribution across age groups, highlighting engagement trends across different age demographics.
+This stacked bar chart displays how player age is distributed across different gender categories. It gives us insight into which age groups are dominant within each gender and how engagement may vary by demographic.
 
 players_age_line <- players_tidy |>
 ggplot(aes(x = Age, fill = gender)) + 
