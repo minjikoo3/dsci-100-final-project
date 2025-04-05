@@ -96,6 +96,26 @@ This technique helps detect overfitting and provides a better estimate of how th
 players_vfold <- vfold_cv(players_train, v = 5, strata = gender)
 players_vfold
 
+### Create a KNN Model Specification
+We’ll define the model with a tunable number of neighbors (`neighbors`).
+set.seed(123)
+knn_spec <- nearest_neighbor(mode = "classification", neighbors = tune()) |>
+set_engine("kknn")
+knn_recipe <- recipe(subscription ~ gender + age + played_hours, data = players_train)
+knn_workflow <- workflow() |>
+add_model(knn_spec) |>
+add_recipe(knn_recipe)
+
+knn_results <- tune_grid(
+knn_workflow,
+resamples = players_vfold,
+grid = tibble(neighbors = seq(1, 20)),
+metrics = metric_set(accuracy))
+
+knn_accuracy <- knn_results |>
+collect_metrics() |>
+filter(.metric == "accuracy")
+  
 ### Data Visualization
 To understand the data better, we created two visualizations using `ggplot`. These help explore patterns and potential relationships between gender, age, and played hours.
 
@@ -149,4 +169,14 @@ xlab("Standardized Age") +
 ylab("Count") +
 ggtitle("Figure 4: Age Distribution by Gender (Train vs Test)") +
 scale_fill_brewer(palette = "Set2") +
+theme(text = element_text(size = 20))
+
+Figure 5 Figure 5 shows how the model's prediction accuracy changes with different values of `k`. By observing this plot, we can identify the `k` that provides the highest mean accuracy while balancing bias and variance. 
+
+ggplot(knn_accuracy, aes(x = neighbors, y = mean)) +
+geom_line(color = "black", size = 1.2) +
+geom_point(size = 3, color = "blue") +
+ggtitle("Figure 5: KNN Model Accuracy vs. Number of Neighbors") +
+xlab("Number of Neighbors (k)") +
+ylab("Mean Accuracy (5-Fold CV)") +
 theme(text = element_text(size = 20))
