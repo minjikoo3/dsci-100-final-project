@@ -69,6 +69,11 @@ players_split <- initial_split(players_scaled, prop = 0.75, strata = gender)
 players_train <- training(players_split)
 players_test <- testing(players_split)
 
+players_train1 <- players_train |> mutate(set = "Train")
+players_test1 <- players_test |> mutate(set = "Test")
+
+players_combined <- bind_rows(players_train1, players_test1)
+
 ### Implementing Five-Fold Cross-Validation
 Instead of relying on just one train-test split, we implemented five-fold cross-validation using `vfold_cv()`.
 
