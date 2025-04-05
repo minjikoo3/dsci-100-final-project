@@ -98,10 +98,11 @@ players_vfold
 
 ### Create a KNN Model Specification
 We’ll define the model with a tunable number of neighbors (`neighbors`).
+
 set.seed(123)
 knn_spec <- nearest_neighbor(mode = "classification", neighbors = tune()) |>
 set_engine("kknn")
-knn_recipe <- recipe(subscription ~ gender + age + played_hours, data = players_train)
+knn_recipe <- recipe(subscribe ~ gender + Age + played_hours, data = players_train)
 knn_workflow <- workflow() |>
 add_model(knn_spec) |>
 add_recipe(knn_recipe)
