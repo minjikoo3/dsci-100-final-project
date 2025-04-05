@@ -96,7 +96,7 @@ players_vfold <- vfold_cv(players_train, v = 5, strata = gender)
 players_vfold
 
 ### Create a KNN Model Specification
-We’ll define the model with a tunable number of neighbors (`neighbors`).
+We’ll define the model with a tunable number of neighbors (`neighbors`). We implemented K-Nearest Neighbors (KNN) because it's a simple yet effective non-parametric classification algorithm that works well when the data has a clear structure but may not follow a linear relationship. In our case, we wanted to predict a player's gender based on two features: their played hours and age.
 
 set.seed(123)
 knn_spec <- nearest_neighbor(mode = "classification", neighbors = tune()) |>
