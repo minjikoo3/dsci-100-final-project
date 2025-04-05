@@ -126,9 +126,7 @@ scale_fill_brewer(palette = "Set2") +
 theme(text = element_text(size = 20))
 players_age_line
 
-
-Figure 3 shows how played hours vary across different genders, separately for the training and testing sets. We use boxplots because they effectively highlight the median, spread, and potential outliers in the data.
-By faceting by set (Train vs Test), we check whether the model has a balanced representation of each gender and their play behavior in both splits. This ensures that training and testing sets are comparable and that the model is not learning from a skewed or biased subset. If the distribution looked drastically different between the two, it would raise concerns about the reliability of model performance metrics.
+Figure 3 shows how played hours vary across different genders, separately for the training and testing sets. This figure presents bar plots comparing the mean standardized played hours for each gender in both the training and testing datasets. We chose bar plots here  to simplify interpretation and highlight average differences in gaming activity by gender. By visualizing the means across the two data subsets, we ensure that the training and testing sets are reasonably balanced and that no significant gender-based bias exists in terms of playtime. This step is essential before proceeding with modeling, as uneven representation or outlier-driven skew in training/testing data could influence model performance or interpretation.
 
 options(repr.plot.width = 8, repr.plot.height = 6)
 ggplot(players_combined, aes(x = gender, y = played_hours, fill = gender)) +
