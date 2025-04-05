@@ -82,7 +82,9 @@ This process repeats 5 times, each time using a different fold for validation.
 
 This technique helps detect overfitting and provides a better estimate of how the model is expected to perform on new data. Stratification by gender is used again here to ensure balance across folds.
 
-suppressWarnings(players_vfold <- vfold_cv(players_train, v = 5, strata = gender))
+players_train <- drop_na(players_train)
+players_train$gender <- as.factor(players_train$gender)
+players_vfold <- vfold_cv(players_train, v = 5)
 players_vfold
 
 ### Data Visualization
