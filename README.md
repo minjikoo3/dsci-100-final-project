@@ -103,28 +103,29 @@ Figure 1: Total Played Hours by Gender
 This bar chart shows the total number of hours played by each gender group. It helps identify which gender groups are more active or more represented in the game environment
 
 gender_bar <- players_tidy |>
-                ggplot(aes(x = gender, y = played_hours, fill = gender)) +
-                geom_col() +
-                xlab("Gender of Players") +
-                ylab("Total Played Hours") +
-                ggtitle("Figure 1: Total Played Hours by Gender") +
-                scale_fill_brewer(palette = "Set2") +
-                theme(text = element_text(size = 20)) +
-                theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(aes(x = gender, y = played_hours, fill = gender)) +
+geom_col() +
+xlab("Gender of Players") +
+ylab("Total Played Hours") +
+ggtitle("Figure 1: Total Played Hours by Gender") +
+scale_fill_brewer(palette = "Set2") +
+theme(text = element_text(size = 20)) +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
 gender_bar
 
 Figure 2: Gender Distribution by Age
 This stacked bar chart displays how player age is distributed across different gender categories. It gives us insight into which age groups are dominant within each gender and how engagement may vary by demographic.
 
 players_age_line <- players_tidy |>
-                    ggplot(aes(x = Age, fill = gender)) + 
-                    geom_bar() + 
-                    xlab("Age of Players") +
-                    ylab("Count of Players") +
-                    ggtitle("Figure 2: Gender Distribution by Age") +
-                    scale_fill_brewer(palette = "Set2") + 
-                    theme(text = element_text(size = 20))
+ggplot(aes(x = Age, y = gender, fill = gender)) + 
+geom_bar(stat = "identity") + 
+xlab("Age of the Players") +
+ylab("Gender of Players") +
+ggtitle("Gender vs Age of the Players") +
+scale_fill_brewer(palette = "Set2") + 
+theme(text = element_text(size = 20))
 players_age_line
+
 
 Figure 3 shows how played hours vary across different genders, separately for the training and testing sets. We use boxplots because they effectively highlight the median, spread, and potential outliers in the data.
 By faceting by set (Train vs Test), we check whether the model has a balanced representation of each gender and their play behavior in both splits. This ensures that training and testing sets are comparable and that the model is not learning from a skewed or biased subset. If the distribution looked drastically different between the two, it would raise concerns about the reliability of model performance metrics.
