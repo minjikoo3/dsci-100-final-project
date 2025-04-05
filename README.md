@@ -31,7 +31,6 @@ library(tidyverse)
 library(repr)
 library(tidymodels)
 options(repr.matrix.max.rows = 5)
-# source('cleanup.R')
 
 player_url <- "https://raw.githubusercontent.com/minjikoo3/DSCI_100_Project_Planning/refs/heads/main/players.csv"
 players <- read_csv(player_url)
