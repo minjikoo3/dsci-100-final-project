@@ -123,7 +123,7 @@ Figure 3 shows how played hours vary across different genders, separately for th
 By faceting by set (Train vs Test), we check whether the model has a balanced representation of each gender and their play behavior in both splits. This ensures that training and testing sets are comparable and that the model is not learning from a skewed or biased subset. If the distribution looked drastically different between the two, it would raise concerns about the reliability of model performance metrics.
 
 ggplot(players_combined, aes(x = gender, y = played_hours, fill = gender)) +
-geom_boxplot() +
+geom_bar() +
 facet_wrap(~ set) +
 xlab("Gender") +
 ylab("Standardized Played Hours") +
@@ -135,10 +135,10 @@ Figure 4 uses histograms to visualize how age is distributed by gender in the tr
 We chose a histogram because it’s ideal for seeing the frequency distribution of a continuous variable like age. The alpha blending allows overlapping bars to show where genders co-occur more frequently. Ensuring these distributions align across splits is important for the validity and generalizability of the model, especially since age is a key explanatory variable in our analysis.
 
 ggplot(players_combined, aes(x = Age, fill = gender)) +
-geom_histogram(position = "identity", alpha = 0.6, bins = 20) +
+geom_histogram(position = "identity", bins = 50) +
 facet_wrap(~ set) +
 xlab("Standardized Age") +
 ylab("Count") +
 ggtitle("Figure 4: Age Distribution by Gender (Train vs Test)") +
 scale_fill_brewer(palette = "Set2") +
-theme_minimal(base_size = 14)
+theme(text = element_text(size = 20))
